@@ -1,0 +1,14 @@
+{
+  "name": "bull-bear-bot",
+  "version": "1.0.0",
+  "description": "Deriv Bull & Bear Bot running on GitHub Actions",
+  "main": "buy-both.js",
+  "scripts": {
+    "start": "node buy-both.js"
+  },
+  "dependencies": {
+    "ws": "^8.13.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
