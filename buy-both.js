@@ -8,18 +8,18 @@ const TRADES = [
     {
         symbol: 'RDBEAR',            // ✅ Use a valid API symbol (like R_100)
         contract_type: 'PUT',
-        barrier: '-150',           // ✅ Barrier offset for no-loss strategy
+        barrier: '-140',           // ✅ Barrier offset for no-loss strategy
         stake: 10,                   // 💲 Amount to stake
 
-        duration: 1000,                // ⏱ Duration
+        duration: 1400,                // ⏱ Duration
         duration_unit: 'm',
     },
     {
         symbol: 'RDBULL',
         contract_type: 'CALL',
-        barrier: '+250',
+        barrier: '+230',
         stake: 10,
-        duration: 1000,
+        duration: 1400,
         duration_unit: 'm',
     },
 
