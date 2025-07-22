@@ -1,31 +1,37 @@
 const WebSocket = require('ws');
 
-const API_TOKEN = process.env.DERIV_API_TOKEN;  // Secure token from GitHub Secrets
+// 💡 Replace this with your API Token (or use process.env.DERIV_API_TOKEN)
+const API_TOKEN = process.env.DERIV_API_TOKEN || 'Sst6KXGL2Nh8zpx';
 
-// Trade 1 (RDBULL - Call)
-const TRADE_1 = {
-    symbol: 'RDBULL',
-    contract_type: 'CALL',
-    barrier: '+0.1',
-    stake: 1,
-    duration: 1,
-    duration_unit: 'm',
-};
+// 🏦 Trading configuration
+const TRADES = [
+    {
+        symbol: 'RDBEAR',            // ✅ Use a valid API symbol (like R_100)
+        contract_type: 'PUT',
+        barrier: '-150',           // ✅ Barrier offset for no-loss strategy
+        stake: 10,                   // 💲 Amount to stake
 
-// Trade 2 (RDBEAR - Put)
-const TRADE_2 = {
-    symbol: 'RDBEAR',
-    contract_type: 'PUT',
-    barrier: '-0.01',
-    stake: 10,
-    duration: 120,
-    duration_unit: 'm',
-};
+        duration: 1400,                // ⏱ Duration
+        duration_unit: 'm',
+    },
+    {
+        symbol: 'RDBULL',
+        contract_type: 'CALL',
+        barrier: '+250',
+        stake: 10,
+        duration: 1400,
+        duration_unit: 'm',
+    },
 
+];
+
+// 🌐 Connect to Deriv WebSocket API
 const ws = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
 
+// 🔥 Utility function to send data
 const send = (data) => ws.send(JSON.stringify(data));
 
+// ✅ WebSocket Events
 ws.on('open', () => {
     console.log('🔗 WebSocket connected');
     send({ authorize: API_TOKEN });
@@ -33,26 +39,31 @@ ws.on('open', () => {
 
 ws.on('message', (msg) => {
     const data = JSON.parse(msg);
+
     if (data.msg_type === 'authorize') {
-        console.log('✅ Authorized');
-        placeBothTrades();
+        console.log('✅ Authorized successfully');
+        placeAllTrades();
     }
+
     if (data.buy && data.buy.longcode) {
         console.log(`🛒 Trade placed: ${data.buy.longcode}`);
         console.log(`📄 Contract ID: ${data.buy.contract_id}`);
-    } else if (data.error) {
-        console.error('❌ Error:', data.error.message);
+    }
+
+    if (data.error) {
+        console.error('❌ API Error:', data.error.message);
     }
 });
 
 ws.on('close', () => {
-    console.log('🔌 Disconnected from Deriv API');
+    console.log('🔌 WebSocket disconnected');
 });
 
 ws.on('error', (err) => {
     console.error('⚠️ WebSocket Error:', err.message);
 });
 
+// 📈 Place a single trade
 function placeTrade(trade) {
     const contract = {
         buy: 1,
@@ -65,15 +76,26 @@ function placeTrade(trade) {
             duration: trade.duration,
             duration_unit: trade.duration_unit,
             symbol: trade.symbol,
-            barrier: trade.barrier,
         },
     };
-    console.log(`📈 Placing trade: ${trade.symbol} ${trade.contract_type} ${trade.barrier}`);
+
+    // ➕ Add barrier if provided
+    if (trade.barrier) {
+        contract.parameters.barrier = trade.barrier;
+    }
+
+    console.log(`📈 Placing trade: ${trade.symbol} ${trade.contract_type} Barrier: ${trade.barrier}`);
     send(contract);
 }
 
-function placeBothTrades() {
-    placeTrade(TRADE_1);
-    placeTrade(TRADE_2);
-    setTimeout(() => ws.close(), 5000);
+// 🔥 Place all trades simultaneously
+function placeAllTrades() {
+    for (const trade of TRADES) {
+        placeTrade(trade);
+    }
+
+    // Wait 10 seconds before closing WebSocket
+    setTimeout(() => {
+        ws.close();
+    }, 10000);
 }
