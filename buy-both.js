@@ -11,7 +11,7 @@ const TRADES = [
         barrier: '-150',           // ✅ Barrier offset for no-loss strategy
         stake: 10,                   // 💲 Amount to stake
 
-        duration: 1400,                // ⏱ Duration
+        duration: 1000,                // ⏱ Duration
         duration_unit: 'm',
     },
     {
@@ -19,7 +19,7 @@ const TRADES = [
         contract_type: 'CALL',
         barrier: '+250',
         stake: 10,
-        duration: 1400,
+        duration: 1000,
         duration_unit: 'm',
     },
 
